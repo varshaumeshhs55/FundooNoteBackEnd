@@ -1,0 +1,37 @@
+package com.bridgelabz.fundoonotes.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.bridgelabz.fundoonotes.ApplicationConfig;
+import com.bridgelabz.fundoonotes.dao.UserRepository;
+import com.bridgelabz.fundoonotes.model.User;
+@Service
+public class UserServiceImpl implements UserService {
+	@Autowired
+	private UserRepository userRepository;
+
+//	public User registerUser(User user) {
+//
+//		return userRepository.save(user);
+//	}
+@Autowired
+private BCryptPasswordEncoder bcryptEncoder;
+	@Override
+	public User registerUser(User user) {
+		// TODO Auto-generated method stub
+		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User loginUser(User user) {
+	System.out.println("login");
+		// TODO Auto-generated method stub
+		return userRepository.findByEmailId(user.getEmailId());
+		
+	}
+
+
+}

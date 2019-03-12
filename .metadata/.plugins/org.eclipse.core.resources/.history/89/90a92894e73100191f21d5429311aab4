@@ -1,0 +1,33 @@
+package com.bridgelabz.fundoonotes.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.bridgelabz.fundoonotes.dao.UserRepository;
+import com.bridgelabz.fundoonotes.model.User;
+@Service
+public class UserServiceImpl implements UserService {
+	@Autowired
+	private UserRepository userRepository;
+
+//	public User registerUser(User user) {
+//
+//		return userRepository.save(user);
+//	}
+
+	@Override
+	public User registerUser(User user) {
+		// TODO Auto-generated method stub
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User loginUser(User user) {
+	System.out.println("login");
+		// TODO Auto-generated method stub
+		return userRepository.findByEmailId(user.getEmailId());
+		
+	}
+
+
+}

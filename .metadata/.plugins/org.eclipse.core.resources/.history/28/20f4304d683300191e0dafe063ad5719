@@ -1,0 +1,92 @@
+package com.bridgelabz.fundoonotes.service;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import com.bridgelabz.fundoonotes.Utility.Email;
+import com.bridgelabz.fundoonotes.Utility.TokenGenerator;
+import com.bridgelabz.fundoonotes.dao.UserRepository;
+import com.bridgelabz.fundoonotes.model.User;
+
+@Service
+public class UserServiceImpl implements UserService {
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private TokenGenerator tokenGenerator;
+	@Autowired
+	private Email email;
+
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+	public User registerUser(User user, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+		if (userRepository.save(user) != null) {
+
+			String token = tokenGenerator.generateToken(String.valueOf(user.getId()));
+			StringBuffer Url = request.getRequestURL();
+			String activeUrl = Url.substring(0, Url.lastIndexOf("/"));
+			activeUrl = activeUrl + "/activationstatus/" + token;
+
+			email.sendMail("varshaumesh555@gmail.com", "verification mail", activeUrl);
+		}
+		return user;
+	}
+
+	public User loginUser(User user, HttpServletRequest request, HttpServletResponse response) {
+		System.out.println("login");
+		// TODO Auto-generated method stub
+		User newUser = userRepository.findByEmailId(user.getEmailId());
+		if (newUser != null) {
+			boolean matches = bCryptPasswordEncoder.matches(user.getPassword(), newUser.getPassword());
+			if (matches && newUser.getActive()) {
+				String token = tokenGenerator.generateToken(String.valueOf(newUser.getId()));
+				response.setHeader("token", token);
+				return newUser;
+			}
+		}
+		return null;
+	}
+
+	public User activateUser(String token, HttpServletRequest request) {
+		int id = tokenGenerator.authenticateToken(token);
+		User newUser = userRepository.findById(id);
+		if (newUser != null) {
+			newUser.setActive(true);
+			userRepository.save(newUser);
+		}
+		return newUser;
+	}
+
+	
+	public User updateUser(String token, User user, HttpServletRequest request) {
+		int id = tokenGenerator.authenticateToken(token);
+		User newUser = userRepository.findById(id);
+		if (newUser != null) {
+			newUser.setMobileNumber(user.getMobileNumber());
+			newUser.setName(user.getName());
+			newUser.setEmailId(user.getEmailId());
+			newUser.setPassword(user.getPassword());
+			newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+			userRepository.save(newUser);
+			}
+		return newUser;
+	}
+
+	
+
+	
+	public User deleteUser(String token, HttpServletRequest request) {
+		int id = tokenGenerator.authenticateToken(token);
+		User newUser = userRepository.findById(id);
+		if (newUser != null) {
+			userRepository.delete(newUser);
+		}
+		return newUser;
+	 
+	}
+}

@@ -1,0 +1,50 @@
+package com.bridgelabz.fundoonotes.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.bridgelabz.fundoonotes.dao.UserRepository;
+import com.bridgelabz.fundoonotes.model.User;
+@Service
+public class UserServiceImpl implements UserService {
+	@Autowired
+	private UserRepository userRepository;
+
+//	public User registerUser(User user) {
+//
+//		return userRepository.save(user);
+//	}
+@Autowired
+private BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Override
+	public User registerUser(User user) {
+		// TODO Auto-generated method stub
+		 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));		return userRepository.save(user);
+	}
+//	@Transactional
+//	public boolean register(User user, HttpServletRequest request) {
+//		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+//		int id = userDao.register(user);
+//		if (id > 0) {
+//			String token = tokenGenerator.generateToken(String.valueOf(id));
+//			StringBuffer Url = request.getRequestURL();
+//			String activeUrl = Url.substring(0, Url.lastIndexOf("/"));
+//			activeUrl = activeUrl + "/activationstatus/" + token;
+//
+//			email.sendMail("varshaumesh555@gmail.com", "verification mail", activeUrl);
+//			return true;
+//		}
+//		return false;
+//	}
+
+	@Override
+	public User loginUser(User user) {
+	System.out.println("login");
+		// TODO Auto-generated method stub
+		return userRepository.findByEmailId(user.getEmailId());
+		
+	}
+
+
+}

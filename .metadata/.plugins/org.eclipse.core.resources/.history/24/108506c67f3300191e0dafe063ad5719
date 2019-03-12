@@ -1,0 +1,14 @@
+package com.bridgelabz.fundoonotes.msNoteService;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+@Configuration
+@ComponentScan
+@SpringBootApplication
+public class MsNoteServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(MsNoteServiceApplication.class, args);
+	}
+
+}

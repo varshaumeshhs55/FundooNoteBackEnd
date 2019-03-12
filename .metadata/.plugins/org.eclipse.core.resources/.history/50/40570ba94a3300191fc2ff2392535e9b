@@ -1,0 +1,83 @@
+package com.bridgelabz.fundoonotes.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.bridgelabz.fundoonotes.Utility.Email;
+import com.bridgelabz.fundoonotes.Utility.TokenGenerator;
+import com.bridgelabz.fundoonotes.dao.UserRepository;
+import com.bridgelabz.fundoonotes.model.User;
+@Service
+public class UserServiceImpl implements UserService {
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private TokenGenerator tokenGenerator;
+	@Autowired
+	private Email email;
+
+
+@Autowired
+private BCryptPasswordEncoder bCryptPasswordEncoder;
+	@Override
+	public User registerUser(User user, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));		
+		 if(userRepository.save(user)!=null) {
+		 
+		 String token = tokenGenerator.generateToken(String.valueOf(user.getId()));
+			StringBuffer Url = request.getRequestURL();
+			String activeUrl = Url.substring(0, Url.lastIndexOf("/"));
+			activeUrl = activeUrl + "/activationstatus/" + token;
+
+			email.sendMail("varshaumesh555@gmail.com", "verification mail", activeUrl);}
+			return user;
+	}
+//	@Transactional
+//	public boolean register(User user, HttpServletRequest request) {
+//		user.setPassword(bcryptEncoder.encode(user.getPassword()));
+//		int id = userDao.register(user);
+//		if (id > 0) {
+//			String token = tokenGenerator.generateToken(String.valueOf(id));
+//			StringBuffer Url = request.getRequestURL();
+//			String activeUrl = Url.substring(0, Url.lastIndexOf("/"));
+//			activeUrl = activeUrl + "/activationstatus/" + token;
+//
+//			email.sendMail("varshaumesh555@gmail.com", "verification mail", activeUrl);
+//			return true;
+//		}
+//		return false;
+//	}
+
+	@Override
+	public User loginUser(User user) {
+	System.out.println("login");
+		// TODO Auto-generated method stub
+		return userRepository.findByEmailId(user.getEmailId());
+		
+	}
+
+//	@Override
+//	public User activateUser(String token, HttpServletRequest request) {
+//		int id = tokenGenerator.authenticateToken(token);
+//		User user = userRepository.get(id);
+//		if (user != null) {
+//			user.setActivationStatus(true);
+//			userDao.updateUser(user);
+//		}
+//		return user;
+//	}
+	public User activateUser(String token, HttpServletRequest request) {
+        int id=tokenGenerator.authenticateToken(token);
+        User newUser=userRepository.findById(id);
+        if(newUser != null) {newUser.setActive(true);
+        userRepository.save(newUser);
+        }
+        return newUser;
+	}
+
+
+}

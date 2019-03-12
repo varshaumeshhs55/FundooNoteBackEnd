@@ -1,0 +1,40 @@
+package com.bridgelabz.fundoonotes.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.bridgelabz.fundoonotes.Utility.UserValidation;
+
+@SuppressWarnings("deprecation")
+@Configuration
+@ComponentScan("com.bridgelabz.fundoonotes")
+public class ApplicationConfig {
+
+	@Bean
+	public BCryptPasswordEncoder getPasswordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	@Bean
+	public UserValidation getValidation() {
+		return new UserValidation();}
+
+	@SuppressWarnings("deprecation")
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurerAdapter() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE").allowedOrigins("*")
+				.allowedHeaders("*");
+			}
+		};
+
+
+
+	}
+}

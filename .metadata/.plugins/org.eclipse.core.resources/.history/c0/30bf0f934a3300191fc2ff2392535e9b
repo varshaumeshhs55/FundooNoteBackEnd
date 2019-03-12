@@ -1,0 +1,15 @@
+package com.bridgelabz.fundoonotes.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.bridgelabz.fundoonotes.model.User;
+
+public interface UserService {
+
+	User registerUser(User user,HttpServletRequest request);
+	
+	User loginUser(User user);
+
+	User activateUser(String token, HttpServletRequest request);
+	
+}
